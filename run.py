@@ -25,7 +25,7 @@ def main(search_query, openai_api_key):
     df = pandas.DataFrame(list_object)
     df.to_csv("output.csv", index=False)
 
-    print("Please check the file output.csv")
+    print(f"Please check the file {os.getcwd()}/output.csv")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Search Upwork projects and process results.")
