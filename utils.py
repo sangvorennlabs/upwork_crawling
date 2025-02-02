@@ -64,15 +64,15 @@ def crawl_4_ai(url):
 def crawl_4_ai_many(urls)-> List[CrawlResult]:
     async def crawl_batch(urls):
         final_result = []
-        browser_config = BrowserConfig(headless=True, verbose=False)
+        browser_config = BrowserConfig(headless=True, verbose=True)
         
         dispatcher = MemoryAdaptiveDispatcher(
-            memory_threshold_percent=70.0,
+            memory_threshold_percent=90.0,
             check_interval=1.0,
-            max_session_permit=10,
-            monitor=CrawlerMonitor(
-                display_mode=DisplayMode.DETAILED
-            )
+            max_session_permit=8,
+            # monitor=CrawlerMonitor(
+            #     display_mode=DisplayMode.DETAILED
+            # )
         )
         
         run_config = CrawlerRunConfig(
