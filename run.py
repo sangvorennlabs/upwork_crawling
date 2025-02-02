@@ -4,11 +4,15 @@ from typing import List
 from joblib import Parallel, delayed
 import pandas
 
-def main(search_query):
+def main(search_query, openai_api_key):
     base_url = "https://www.upwork.com"
 
     clear_folder("cache")
     os.makedirs('cache', exist_ok=True)
+    
+    if openai_api_key:
+        os.environ['OPENAI_API_KEY'] = openai_api_key
+        print('OPENAI_API_KEY set succesfully')
 
     article_links = search_projects_upwork(search_query)
 
@@ -26,7 +30,8 @@ def main(search_query):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Search Upwork projects and process results.")
     parser.add_argument("-search_query", type=str, required=True, help="Search query for Upwork projects")
+    parser.add_argument("-openai_api_key", type=str, required=False, help="OpenAI API key")
     
     args = parser.parse_args()
     
-    main(args.search_query)
+    main(args.search_query, args.openai_api_key)

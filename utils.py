@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 import asyncio
 from crawl4ai import *
 import re
