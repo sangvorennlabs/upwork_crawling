@@ -1,6 +1,7 @@
 import requests
 import asyncio
 from crawl4ai import *
+from crawl4ai.async_dispatcher import SemaphoreDispatcher
 import re
 from typing import List
 from pydantic import BaseModel, Field
@@ -64,13 +65,29 @@ def crawl_4_ai_many(urls)-> List[CrawlResult]:
     async def crawl_batch(urls):
         final_result = []
         browser_config = BrowserConfig(headless=True, verbose=False)
+        
+        dispatcher = MemoryAdaptiveDispatcher(
+            memory_threshold_percent=70.0,
+            check_interval=1.0,
+            max_session_permit=10,
+            monitor=CrawlerMonitor(
+                display_mode=DisplayMode.DETAILED
+            )
+        )
+        
         run_config = CrawlerRunConfig(
             cache_mode=CacheMode.BYPASS,
             stream=False,  # Default: get all results at once
             delay_before_return_html=1,
         )
+        
         async with AsyncWebCrawler(config=browser_config) as crawler:
-            results = await crawler.arun_many(urls, config=run_config)
+            results = await crawler.arun_many(
+                urls=urls,
+                config=run_config,
+                dispatcher=dispatcher
+            )
+
             for i, result in enumerate(results):
                 print(f"URL: {result.url}, Success: {result.success}")
                 save(f'project_result_{i}.html', result.html)
@@ -80,9 +97,9 @@ def crawl_4_ai_many(urls)-> List[CrawlResult]:
     
     return asyncio.run(crawl_batch(urls))
 
-def crawl_4_ai_many(urls)-> List[CrawlResult]:
-    result: List[ResultStructure] = Parallel(n_jobs=-1)(delayed(crawl_4_ai)(url) for url in urls)
-    return result
+# def crawl_4_ai_many(urls)-> List[CrawlResult]:
+#     result: List[ResultStructure] = Parallel(n_jobs=-1, prefer='threads')(delayed(crawl_4_ai)(url) for url in urls)
+#     return result
 
 
 def search_projects_upwork(query):
