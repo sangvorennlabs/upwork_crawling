@@ -80,6 +80,9 @@ def crawl_4_ai_many(urls)-> List[CrawlResult]:
     
     return asyncio.run(crawl_batch(urls))
 
+def crawl_4_ai_many(urls)-> List[CrawlResult]:
+    result: List[ResultStructure] = Parallel(n_jobs=-1)(delayed(crawl_4_ai)(url) for url in urls)
+    return result
 
 
 def search_projects_upwork(query):
